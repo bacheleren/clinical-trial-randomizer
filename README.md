@@ -4,6 +4,8 @@ A lightweight, deterministic, and stateless clinical trial randomizer built with
 
 This application provides a scientifically rigorous randomization process without the overhead of backend databases or complex user authentication. It is designed to prioritize clinical usability, rapid allocation, and clear source documentation while maintaining mathematical reproducibility.
 
+Try it now: [Working Streamlit App](https://clinical-trial-randomizer.streamlit.app/)
+
 ## Key Features
 
 * **Deterministic Seed Logic:** Combines a user-defined Study Seed and Sample Size to generate a mathematically reproducible allocation list. The same inputs will always yield the exact same master list.
