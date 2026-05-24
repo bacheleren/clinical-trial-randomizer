@@ -46,8 +46,8 @@ with st.sidebar:
         input_seed = st.text_input("Study Seed (e.g., studyname)", value=st.session_state.study_seed)
         input_size = st.number_input("Sample Size", min_value=1, value=st.session_state.study_size)
         
-        # Mobile-friendly submission button
-        submitted = st.form_submit_button("Configure Study", type="primary")
+        # Changed text to "Generate list" and removed primary type for a neutral color
+        submitted = st.form_submit_button("Generate list")
         
         if submitted:
             st.session_state.study_seed = input_seed
@@ -67,6 +67,7 @@ with st.sidebar:
         
         with st.expander("Troubleshooting: View Master List"):
             st.warning("⚠️ For Statistician/Auditing use only. Do not use for patient allocation. Viewing this list breaks allocation concealment.")
+            # Kept the red warning color here where it is appropriate
             if st.button("🚨 REVEAL MASTER LIST 🚨", type="primary"):
                 full_list = generate_randomization_list(active_seed, active_size)
                 df = pd.DataFrame({
@@ -79,7 +80,7 @@ with st.sidebar:
 st.title("Patient Randomization")
 
 if not active_seed:
-    st.info("👈 Please enter a Study Seed and click 'Configure Study' in the sidebar to begin, or use a pre-configured study link.")
+    st.info("👈 Please enter a Study Seed and click 'Generate list' in the sidebar to begin, or use a pre-configured study link.")
 else:
     st.markdown("Enter the patient details below to generate their group assignment.")
     
