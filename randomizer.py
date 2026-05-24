@@ -43,7 +43,7 @@ with st.sidebar:
     st.header("⚙️ Study Setup")
     st.write("Configure the trial parameters here.")
     
-    active_seed = st.text_input("Study Seed (e.g., glaucomastudy)", value=url_seed)
+    active_seed = st.text_input("Study Seed (e.g., studyname)", value=url_seed)
     active_size = st.number_input("Sample Size", min_value=1, value=int(url_size) if url_size.isdigit() else 140)
     
     if active_seed:
