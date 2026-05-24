@@ -33,7 +33,7 @@ This application provides a scientifically rigorous randomization process withou
 
 This app is optimized for deployment on Streamlit Community Cloud.
 
-1. Upload `app.py` and `requirements.txt` to a GitHub repository.
+1. Upload `randomizer.py` and `requirements.txt` to a GitHub repository.
 2. Navigate to [Streamlit Community Cloud](https://share.streamlit.io/).
 3. Connect your GitHub account and select the repository.
 4. Click **Deploy**. The app will be live and accessible via a public link in minutes.
