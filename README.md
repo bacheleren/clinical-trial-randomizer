@@ -46,7 +46,7 @@ Este aplicativo fornece um processo de randomização rigoroso, sem a necessidad
 
 ### Principais Funcionalidades
 
-* **Lógica de Semente (Seed) Determinística:** Combina uma semente definida pelo usuário e o Tamanho da Amostra para gerar uma lista de alocação matematicamente reprodutível.
+* **Lógica de Seed Determinística:** Combina uma seed definida pelo usuário e o Tamanho da Amostra para gerar uma lista de alocação matematicamente reprodutível.
 * **Blocos Aleatórios Permutados:** Utiliza blocos de tamanhos aleatórios (2, 4 e 6) para garantir o balanceamento e evitar a previsão de alocação (viés de seleção).
 * **Configuração por Parâmetros de URL:** Administradores configuram o estudo uma vez e geram uma URL customizada. Quando os clínicos abrem o link, o app já está configurado no idioma correto.
 * **Arquitetura Stateless:** Não requer banco de dados. Os clínicos inserem o Número de Sequência exato, eliminando o risco de cliques duplos acidentais arruinarem uma sequência.
@@ -58,7 +58,7 @@ Este aplicativo fornece um processo de randomização rigoroso, sem a necessidad
 #### 1. Configuração do Administrador (Investigador Principal / Estatístico)
 1. Abra o aplicativo.
 2. Selecione o idioma desejado na barra lateral (English 🇺🇸 ou Português 🇧🇷).
-3. Insira a **Semente do Estudo** (ex: `nome-do-estudo`) e o **Tamanho da Amostra** (ex: `140`).
+3. Insira a **Seed do Estudo** (ex: `nome-do-estudo`) e o **Tamanho da Amostra** (ex: `140`).
 4. O aplicativo gerará imediatamente uma URL de compartilhamento (ex: `https://clinical-trial-randomizer.streamlit.app/?seed=nome-do-estudo&size=140&lang=pt`).
 5. Distribua este link exato para os centros de pesquisa.
 6. *Opcional:* Expanda a aba "Solução de Problemas" e clique no botão de alerta vermelho para visualizar a lista principal com segurança.
