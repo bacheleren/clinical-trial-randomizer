@@ -4,6 +4,7 @@ import pandas as pd
 
 # --- CORE ALGORITHM ---
 def generate_randomization_list(seed_text, sample_size):
+    # Combine the seed word and sample size to create a unique, reproducible state
     combined_seed = f"{seed_text}_{sample_size}"
     random.seed(combined_seed)
     
@@ -12,62 +13,52 @@ def generate_randomization_list(seed_text, sample_size):
     
     randomization_list = []
     
+    # Generate random blocks until we hit the required sample size
     while len(randomization_list) < sample_size:
         current_block_size = random.choice(block_sizes)
+        
+        # Split the block equally between Group 1 and Group 2
         half_size = current_block_size // 2
         block = (groups[:1] * half_size) + (groups[1:] * half_size)
+        
+        # Shuffle this specific block deterministically based on the seed
         random.shuffle(block)
+        
         randomization_list.extend(block)
         
+    # Truncate the list to the exact sample size requested
     return randomization_list[:sample_size]
 
 
 # --- STREAMLIT USER INTERFACE ---
 st.set_page_config(page_title="Clinical Trial Randomizer", page_icon="🏥")
 
-# 1. Read URL Parameters & Initialize State
+# 1. Read URL Parameters (for easy sharing)
 query_params = st.query_params
 url_seed = query_params.get("seed", "")
 url_size = query_params.get("size", "140") 
-
-# Use session state to lock in variables after button press or URL load
-if "study_seed" not in st.session_state:
-    st.session_state.study_seed = url_seed
-if "study_size" not in st.session_state:
-    st.session_state.study_size = int(url_size) if url_size.isdigit() else 140
 
 # 2. Sidebar: Admin & Setup
 with st.sidebar:
     st.header("⚙️ Study Setup")
     st.write("Configure the trial parameters here.")
     
-    # Wrap inputs in a form so they only update upon clicking the button
-    with st.form("setup_form"):
-        input_seed = st.text_input("Study Seed (e.g., studyname)", value=st.session_state.study_seed)
-        input_size = st.number_input("Sample Size", min_value=1, value=st.session_state.study_size)
-        
-        # Changed text to "Generate list" and removed primary type for a neutral color
-        submitted = st.form_submit_button("Generate list")
-        
-        if submitted:
-            st.session_state.study_seed = input_seed
-            st.session_state.study_size = input_size
-
-    # Assign active variables from locked-in state
-    active_seed = st.session_state.study_seed
-    active_size = st.session_state.study_size
+    active_seed = st.text_input("Study Seed (e.g., studyname)", value=url_seed)
+    active_size = st.number_input("Sample Size", min_value=1, value=int(url_size) if url_size.isdigit() else 140)
     
     if active_seed:
         st.success("Study configured.")
         st.write("**Shareable URL:**")
+        # Generates the full, direct URL for the clinical staff
         full_url = f"https://clinical-trial-randomizer.streamlit.app/?seed={active_seed}&size={active_size}"
         st.code(full_url)
         
-        st.divider()
-        
-        with st.expander("Troubleshooting: View Master List"):
-            st.warning("⚠️ For Statistician/Auditing use only. Do not use for patient allocation. Viewing this list breaks allocation concealment.")
-            # Kept the red warning color here where it is appropriate
+    st.divider()
+    
+    with st.expander("Troubleshooting: View Master List"):
+        st.warning("⚠️ For Statistician/Auditing use only. Do not use for patient allocation. Viewing this list breaks allocation concealment.")
+        if active_seed:
+            # Added safety feature: explicit red button click required to reveal the list
             if st.button("🚨 REVEAL MASTER LIST 🚨", type="primary"):
                 full_list = generate_randomization_list(active_seed, active_size)
                 df = pd.DataFrame({
@@ -80,7 +71,7 @@ with st.sidebar:
 st.title("Patient Randomization")
 
 if not active_seed:
-    st.info("👈 Please enter a Study Seed and click 'Generate list' in the sidebar to begin, or use a pre-configured study link.")
+    st.info("👈 Please enter a Study Seed in the sidebar to begin, or use a pre-configured study link.")
 else:
     st.markdown("Enter the patient details below to generate their group assignment.")
     
@@ -90,12 +81,17 @@ else:
     with col2:
         patient_id = st.text_input("Subject ID / Initials (Optional)")
         
+    # Changed to secondary button so the red warning button stands out more in the sidebar
     if st.button("Generate Allocation"):
+        # Generate the list silently in the background
         master_list = generate_randomization_list(active_seed, active_size)
+        
+        # Find the specific patient's allocation (List index is Patient No. - 1)
         allocation = master_list[patient_no - 1]
         
         st.divider()
         
+        # Display the result formatted for source documentation screenshotting
         if patient_id:
             st.success(f"### Enrollment #{patient_no} ({patient_id}) \n## Assigned to: **{allocation}**")
         else:
@@ -103,22 +99,20 @@ else:
             
         st.caption("Please record this assignment in the patient's source documentation.")
 
-# 4. Sticky Footer with CSS
-footer_css = """
-<style>
-.footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    background-color: transparent;
-    color: gray;
-    text-align: center;
-    font-size: 0.85em;
-    padding: 10px 0;
-    z-index: 100;
-}
-</style>
-<div class="footer">Developed by Guilherme Bächtold</div>
-"""
-st.markdown(footer_css, unsafe_allow_html=True)
+# 4. Documentation & Addendum
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.info(
+    "**Instructions & Documentation**\n\n"
+    "For full usage instructions, methodological details, or to offer suggestions, please visit the "
+    "[GitHub Repository](https://github.com/bacheleren/clinical-trial-randomizer)."
+)
+
+# 5. Footer
+st.divider()
+st.markdown(
+    "<p style='text-align: center; color: gray; font-size: 0.85em;'>"
+    "Developed by Guilherme Bächtold | "
+    "<a href='https://github.com/bacheleren/clinical-trial-randomizer' target='_blank' style='color: gray; text-decoration: underline;'>View Source</a>"
+    "</p>", 
+    unsafe_allow_html=True
+)
