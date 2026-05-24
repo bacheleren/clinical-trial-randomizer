@@ -11,6 +11,7 @@ t = {
         "seed_label": "Study Seed (e.g., studyname)",
         "size_label": "Sample Size",
         "lang_label": "App Language",
+        "admin_gen_btn": "Generate Study Link",
         "configured": "Study configured.",
         "url_label": "**Shareable URL:**",
         "troubleshoot": "Troubleshooting: View Master List",
@@ -34,6 +35,7 @@ t = {
         "seed_label": "Seed do Estudo (ex: nome-do-estudo)",
         "size_label": "Tamanho da Amostra",
         "lang_label": "Idioma do App",
+        "admin_gen_btn": "Gerar Link do Estudo",
         "configured": "Estudo configurado.",
         "url_label": "**URL de Compartilhamento:**",
         "troubleshoot": "Solução de Problemas: Ver Lista Principal",
@@ -89,7 +91,6 @@ reverse_lang_options = {v: k for k, v in lang_options.items()}
 
 # 2. Sidebar: Admin & Setup
 with st.sidebar:
-    # First get the language choice so the rest of the UI can translate instantly
     selected_display_lang = st.radio("Language / Idioma", options=list(lang_options.values()), index=0 if url_lang == "en" else 1)
     lang = reverse_lang_options[selected_display_lang]
     
@@ -100,10 +101,17 @@ with st.sidebar:
     active_seed = st.text_input(t[lang]["seed_label"], value=url_seed)
     active_size = st.number_input(t[lang]["size_label"], min_value=1, value=int(url_size) if url_size.isdigit() else 140)
     
-    if active_seed:
+    # Explicit Generate Button for Admin
+    if st.button(t[lang]["admin_gen_btn"], type="primary"):
+        if active_seed:
+            st.session_state['study_configured'] = True
+        else:
+            st.warning("Please enter a Study Seed.")
+            
+    # Show the URL only after the button has been clicked and saved in state
+    if st.session_state.get('study_configured') and active_seed:
         st.success(t[lang]["configured"])
         st.write(t[lang]["url_label"])
-        # Generate the full URL including the selected language parameter
         full_url = f"https://clinical-trial-randomizer.streamlit.app/?seed={active_seed}&size={active_size}&lang={lang}"
         st.code(full_url)
         
@@ -118,6 +126,7 @@ with st.sidebar:
                     "Enrollment No.": range(1, active_size + 1), 
                     "Allocation": full_list
                 })
+                # Streamlit dataframes natively have a download icon when you hover over them!
                 st.dataframe(df, hide_index=True)
 
 # 3. Main Page: Clinician Interface
