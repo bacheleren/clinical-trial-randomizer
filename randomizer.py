@@ -48,20 +48,24 @@ with st.sidebar:
     
     if active_seed:
         st.success("Study configured.")
-        st.write("**Shareable URL Parameters:**")
-        st.code(f"/?seed={active_seed}&size={active_size}")
+        st.write("**Shareable URL:**")
+        # Generates the full, direct URL for the clinical staff
+        full_url = f"https://clinical-trial-randomizer.streamlit.app/?seed={active_seed}&size={active_size}"
+        st.code(full_url)
         
     st.divider()
     
     with st.expander("Troubleshooting: View Master List"):
-        st.warning("⚠️ For Statistician/Auditing use only. Do not use for patient allocation.")
+        st.warning("⚠️ For Statistician/Auditing use only. Do not use for patient allocation. Viewing this list breaks allocation concealment.")
         if active_seed:
-            full_list = generate_randomization_list(active_seed, active_size)
-            df = pd.DataFrame({
-                "Enrollment No.": range(1, active_size + 1), 
-                "Allocation": full_list
-            })
-            st.dataframe(df, hide_index=True)
+            # Added safety feature: explicit red button click required to reveal the list
+            if st.button("🚨 REVEAL MASTER LIST 🚨", type="primary"):
+                full_list = generate_randomization_list(active_seed, active_size)
+                df = pd.DataFrame({
+                    "Enrollment No.": range(1, active_size + 1), 
+                    "Allocation": full_list
+                })
+                st.dataframe(df, hide_index=True)
 
 # 3. Main Page: Clinician Interface
 st.title("Patient Randomization")
@@ -77,7 +81,8 @@ else:
     with col2:
         patient_id = st.text_input("Subject ID / Initials (Optional)")
         
-    if st.button("Generate Allocation", type="primary"):
+    # Changed to secondary button so the red warning button stands out more in the sidebar
+    if st.button("Generate Allocation"):
         # Generate the list silently in the background
         master_list = generate_randomization_list(active_seed, active_size)
         
@@ -93,3 +98,8 @@ else:
             st.success(f"### Enrollment #{patient_no} \n## Assigned to: **{allocation}**")
             
         st.caption("Please record this assignment in the patient's source documentation.")
+
+# 4. Footer
+st.markdown("<br><br>", unsafe_allow_html=True)
+st.divider()
+st.markdown("<p style='text-align: center; color: gray; font-size: 0.85em;'>Developed by Guilherme Bächtold</p>", unsafe_allow_html=True)
